@@ -70,39 +70,48 @@ More information is only accessible by people who are already enrolled in Term 2
 of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/b1ff3be0-c904-438e-aad3-2b5379f0e0c3/concepts/1a2255a0-e23c-44cf-8d41-39b8a3c8264a)
 for instructions and the project rubric.
 
-## Hints!
+## Reflection
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+I essentially followed the 3 main steps below to accomplish this
 
-## Call for IDE Profiles Pull Requests
+### Example Mind the Line Quiz
 
-Help your fellow students!
+I leveraged a lot of the template code from this quiz.
+Infact most of my project MPC.cpp is for all practical purposes the same as what was used in the quiz.
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
+### Project Q&A in Google Hangout.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+The Google hangout video gave a lot of hints/information on how to code the main.cpp.
+After following the instructions and NOT incorporating latency into the model, i had issues with the car going of the track.
+I realized that based on the project lesson and the project helper video that i had to modify the co-efficients of the cost function.
+I had to experiment with several values to reach a stage where the car was able to lap the circuit without going off.
+The co-efficients in the project Q7A video did not work for me.
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+### Add Latency
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+I consulted the forum to read up on how to add latency.
+After going through various discussion threads, i settled on how to add latency to the model.
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
+I chose a value of N = 10 and dt = 0.1
 
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+These values were based on suggestions given in the helper videos.
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+```sh
+    for (unsigned int t = 0; t < N; t++) {
+      fg[0] += 2000*CppAD::pow(vars[cte_start + t] - ref_cte, 2);
+      fg[0] += 2000*CppAD::pow(vars[epsi_start + t] - ref_epsi, 2);
+      fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
+    }
+
+    // Minimize the use of actuators.
+    for (unsigned int t = 0; t < N - 1; t++) {
+      fg[0] += 20*CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += 20*CppAD::pow(vars[a_start + t], 2);
+    }
+
+    // Minimize the value gap between sequential actuations.
+    for (unsigned int t = 0; t < N - 2; t++) {
+      fg[0] += 300*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      fg[0] += 15*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+    }
+```
