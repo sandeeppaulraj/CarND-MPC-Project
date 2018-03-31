@@ -95,6 +95,9 @@ After going through various discussion threads, i settled on how to add latency 
 I chose a value of N = 10 and dt = 0.1
 
 These values were based on suggestions given in the helper videos.
+I will note however, that model is very sensitive to the co-efficients to minimize the value gap between sequential actuations.
+For steering a value of 300 worked well for me; however a value of 100 and even 200 gave very poor results.
+
 
 ```sh
     for (unsigned int t = 0; t < N; t++) {
@@ -114,4 +117,35 @@ These values were based on suggestions given in the helper videos.
       fg[0] += 300*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
       fg[0] += 15*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
+```
+
+For adding latency, i did the following simple update.
+I decided to add code for latency only after my car able to go around the lap without going off the circuit.
+
+The update i made for latency is as follows. I used the kinematic equations.
+
+```sh
+	px = px + v * cos(psi) * dt;
+	py = py + v * sin(psi) * dt;
+    psi = psi - v * delta / Lf * dt;
+    v = v + a * dt;
+```
+
+I also made small modifications as suggested in the projects tips and tricks section to modify the psi update.
+
+These are the snippets were the relevant updates were reflected.
+
+```sh
+    psi = psi - v * delta / Lf * dt;
+```
+
+```sh
+    // VVIMP: From Lesson update the sign of the equation below.
+	// Refer TIPS and Tricks section
+    fg[1 + psi_start + t] = psi1 - (psi0 - v0 * delta0 / Lf * dt);
+	
+	// VVIMP: From Lesson update the sign of the equation below.
+	// Refer TIPS and Tricks section
+    fg[1 + epsi_start + t] =
+          epsi1 - ((psi0 - psides0) - v0 * delta0 / Lf * dt);
 ```
