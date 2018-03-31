@@ -94,6 +94,12 @@ int main() {
 		  double delta= j[1]["steering_angle"];
           double a = j[1]["throttle"];
 		  double Lf = 2.67;
+		  double dt = 0.1;
+		  
+		  px = px + v * cos(psi) * dt;
+          py = py + v * sin(psi) * dt;
+          psi = psi - v * delta / Lf * dt;
+          v = v + a * dt;
 		  
 		  for (size_t i = 0; i < ptsx.size(); ++i) {
             // Shift car reference angle to 90 degrees
