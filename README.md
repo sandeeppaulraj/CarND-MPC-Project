@@ -127,8 +127,8 @@ The update i made for latency is as follows. I used the kinematic equations.
 ```sh
 	px = px + v * cos(psi) * dt;
 	py = py + v * sin(psi) * dt;
-    psi = psi - v * delta / Lf * dt;
-    v = v + a * dt;
+	psi = psi - v * delta / Lf * dt;
+	v = v + a * dt;
 ```
 
 I also made small modifications as suggested in the projects tips and tricks section to modify the psi update.
@@ -136,16 +136,15 @@ I also made small modifications as suggested in the projects tips and tricks sec
 These are the snippets were the relevant updates were reflected.
 
 ```sh
-    psi = psi - v * delta / Lf * dt;
+	psi = psi - v * delta / Lf * dt;
 ```
 
 ```sh
-    // VVIMP: From Lesson update the sign of the equation below.
-	// Refer TIPS and Tricks section
-    fg[1 + psi_start + t] = psi1 - (psi0 - v0 * delta0 / Lf * dt);
-	
 	// VVIMP: From Lesson update the sign of the equation below.
 	// Refer TIPS and Tricks section
-    fg[1 + epsi_start + t] =
-          epsi1 - ((psi0 - psides0) - v0 * delta0 / Lf * dt);
+	fg[1 + psi_start + t] = psi1 - (psi0 - v0 * delta0 / Lf * dt);
+
+	// VVIMP: From Lesson update the sign of the equation below.
+	// Refer TIPS and Tricks section
+	fg[1 + epsi_start + t] = epsi1 - ((psi0 - psides0) - v0 * delta0 / Lf * dt);
 ```
